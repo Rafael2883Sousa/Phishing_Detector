@@ -1,0 +1,1 @@
+API FastAPI: /predict, /feedback. Sem código até confirmação.

@@ -1,0 +1,41 @@
+id,label,subject,body
+1,ham,Reunião de acompanhamento,A reunião de acompanhamento fica marcada para amanhã às 10h na sala 3
+2,ham,Envio de atas,Segue em anexo a ata de hoje por email conforme combinado
+3,ham,Entrega concluída,A entrega do equipamento foi concluída às 15h
+4,ham,Confirmação de pagamento,O pagamento da fatura foi confirmado no sistema
+5,ham,Pedido de opinião,Preciso da sua opinião sobre o documento enviado
+6,ham,Alteração de horário,A reunião passa para sexta-feira às 11h
+7,ham,Acesso concedido,O acesso à pasta partilhada foi concedido
+8,ham,Documento revisto,O documento foi revisto sem alterações críticas
+9,ham,Formação interna,Recordo que a formação inicia às 14h
+10,ham,Atualização do projeto,Atualização semanal concluída sem bloqueios
+11,ham,Disponibilidade,Estou disponível para chamada depois das 16h
+12,ham,Confirmação de reserva,A reserva da sala foi confirmada
+13,ham,Notas da reunião,Seguem as notas principais na mensagem abaixo
+14,ham,Planeamento,Planeamento fechado para a próxima sprint
+15,ham,Checklist,Checklist atualizada no servidor interno
+16,ham,Report mensal,O relatório mensal foi submetido
+17,ham,Contactos,Partilhei os contactos na lista interna
+18,ham,Convite,Convite enviado para a sessão de amanhã
+19,ham,Entrega de credenciais,As credenciais temporárias foram entregues ao utilizador
+20,ham,Alteração de morada,Atualizámos a morada no cadastro
+21,phishing,Atualize a sua conta,A sua conta ficará limitada atualize já em http://conta-exemplo.com/atualizar
+22,phishing,Aviso de segurança,Detetámos acesso suspeito verifique em http://seguranca-exemplo.org/login
+23,phishing,Confirmação de pagamento pendente,Confirme o pagamento hoje para evitar multa http://pagamentos-exemplo.com/confirmar
+24,phishing,Prémio disponível,Recebeu um prémio exclusivo resgate em http://oferta-exclusiva.exemplo.net
+25,phishing,Entrega retida,A sua encomenda está retida pague a taxa em http://entrega-pt.exemplo.com/taxa
+26,phishing,Mensagem de voz,Pode ouvir a sua mensagem de voz em http://voz-exemplo.app/play
+27,phishing,Chave de segurança expirada,Ative a nova chave em http://chave.exemplo.io/ativar
+28,phishing,Verificação obrigatória,Confirme a sua identidade em http://validar-acesso.exemplo
+29,phishing,Atualização de password,A sua password expira hoje renove em http://conta-exemplo.com/reset
+30,phishing,Cartão recusado,Atualize o cartão de pagamento http://pagamento.exemplo/pay
+31,phishing,Documento importante,Transfira o documento em http://doc-share.exemplo/download
+32,phishing,Impostos em atraso,Regularize o débito em http://financas-exemplo.pt/pagar
+33,phishing,Atividade incomum,Nova sessão detetada cancele em http://sessao.exemplo/cancelar
+34,phishing,Entrega falhada,Reagende a entrega em http://correio-exemplo.pt/reagendar
+35,phishing,Atualização do sistema,Instale a atualização crítica em http://update-exemplo.systems
+36,phishing,Confirmação de IBAN,Confirme o IBAN em http://transfer.exemplo/iban
+37,phishing,Cupão exclusivo,Resgate o cupão em http://cupao.exemplo/promo
+38,phishing,Fatura pendente,Pague a fatura agora em http://faturas.exemplo/regularizar
+39,phishing,Conta desativada,A conta será desativada sem verificação http://clientes-exemplo.pt/atualizar
+40,phishing,Validação urgente,Valide os dados imediatamente em http://seguro-validar.exemplo.com

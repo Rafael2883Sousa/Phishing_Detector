@@ -1,0 +1,41 @@
+id,label,text
+1,ham,Mensagem de teste normal
+2,ham,Reunião confirmada para amanhã às 10h
+3,ham,A encomenda foi expedida hoje
+4,ham,Pode ligar-me quando for conveniente
+5,ham,Obrigado pela atualização do processo
+6,ham,O pagamento foi recebido com sucesso
+7,ham,Enviei os relatórios por email
+8,ham,Não se esqueça da aula às 18h
+9,ham,Partilhei o ficheiro no servidor interno
+10,ham,Almoço às 13h no local habitual
+11,ham,Bom dia já estou a caminho
+12,ham,O contrato foi assinado ontem
+13,ham,Preciso da sua opinião sobre o documento
+14,ham,Reunião adiada para sexta-feira
+15,ham,Bilhetes disponíveis na receção
+16,ham,A porta estará aberta
+17,ham,Segue a ata da reunião na inbox
+18,ham,Chame-me assim que puder
+19,ham,Entrega concluída às 15h
+20,ham,Enviei a localização por email
+21,phishing,Urgente a sua conta foi temporariamente limitada Valide em http://seguro-validar.exemplo.com
+22,phishing,Atualize os seus dados para evitar bloqueio http://clientes-exemplo.pt/atualizar
+23,phishing,Confirme o pagamento hoje para evitar multa http://pagamentos-exemplo.com/confirmar
+24,phishing,Recebeu um prémio Resgate em http://oferta-exclusiva.exemplo.net
+25,phishing,Aviso acesso suspeito Verifique em http://seguranca-exemplo.org/login
+26,phishing,A sua encomenda está retida Pague a taxa http://entrega-pt.exemplo.com/taxa
+27,phishing,Mensagem de voz pendente Ouça em http://voz-exemplo.app/play
+28,phishing,Ative a nova chave de segurança http://chave.exemplo.io/ativar
+29,phishing,Confirme a morada de envio http://envios.exemplo.pt/confirmar
+30,phishing,A password expira hoje Renove em http://conta-exemplo.com/reset
+31,phishing,Pagamento recusado Atualize o cartão http://pagamento.exemplo/pay
+32,phishing,Documento pendente Baixe em http://doc-share.exemplo/download
+33,phishing,IMPOSTOS regularize o débito aqui http://financas-exemplo.pt/pagar
+34,phishing,Acesso bloqueado por falhas Verificação http://validar-acesso.exemplo
+35,phishing,Nova sessão detetada Se não foi você feche em http://sessao.exemplo/cancelar
+36,phishing,Entrega falhou Reagende em http://correio-exemplo.pt/reagendar
+37,phishing,Atualização obrigatória do sistema Instale em http://update-exemplo.systems
+38,phishing,Confirme IBAN para transferência http://transfer.exemplo/iban
+39,phishing,Cupão de 100€ Resgate em http://cupao.exemplo/promo
+40,phishing,Fatura em atraso Pague agora http://faturas.exemplo/regularizar

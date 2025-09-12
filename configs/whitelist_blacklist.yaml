@@ -1,0 +1,7 @@
+# Whitelist/Blacklist local (exemplo)
+whitelist:
+  senders: []
+  domains: []
+blacklist:
+  senders: []
+  domains: []

@@ -1,0 +1,11 @@
+# Top-level requirements (versões serão resolvidas no lock)
+numpy
+scipy
+pandas
+scikit-learn
+sentence-transformers
+torch
+fastapi
+uvicorn
+lime
+matplotlib
