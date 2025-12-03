@@ -1,21 +1,41 @@
-# --- top ---
-from joblib import load
-import os, json
+# src/api/main.py
+from __future__ import annotations
+import os, sys, json
+from pathlib import Path
 from typing import List, Optional
+
+from pydantic import BaseModel
+from joblib import load
+
 from fastapi import FastAPI
 from pydantic import BaseModel
+from joblib import load
 
-# features
-from src.features.url_signals import url_features
-from src.features.html_url import anchor_mismatch
-from src.features.headers import parse_headers
+from features.url_signals import url_features
+from features.html_url import anchor_mismatch
+from features.headers import parse_headers
 
-PIPE_PATH = os.environ.get("PIPE_PATH", "outputs_email/tfidf_logreg_pipeline.joblib")
+import logging
+
+SRC_DIR = Path(__file__).resolve().parents[1]   
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+
+logger = logging.getLogger("phishing_api")
+
+
+PIPE_PATH   = os.environ.get("PIPE_PATH", "outputs_email/tfidf_logreg_pipeline.joblib")
+# pipe_sms = load(os.environ.get("PIPE_SMS", "outputs_sms/tfidf_logreg_pipeline.joblib"))
+
 REPORT_PATH = os.environ.get("REPORT_PATH", "outputs_email/baseline_report.json")
 
 pipe = load(PIPE_PATH)
 
-# threshold: env > report.json > 0.5
 THRESHOLD = float(os.environ.get("THRESHOLD", "0.5"))
 try:
     with open(REPORT_PATH, "r") as f:
@@ -32,32 +52,47 @@ class EmailInput(BaseModel):
     headers_raw: Optional[str] = ""
     html: Optional[str] = ""
 
-def join_text_email(i: EmailInput) -> str:
+class SmsInput(BaseModel):
+    text: str
+    urls: list[str] | None = None
+
+def _join(i: EmailInput) -> str:
     return f"{i.subject or ''} {i.body or ''}".strip()
 
-def collect_reasons(i: EmailInput) -> List[str]:
-    reasons = []
-    # URL features
+def _reasons(i: EmailInput) -> List[str]:
+    r: List[str] = []
     for u in (i.urls or []):
         feats = url_features(u)
-        reasons += [k for k, v in feats.items() if isinstance(v, bool) and v]
-    # HTML anchor vs href
+        r += [k for k, v in feats.items() if isinstance(v, bool) and v]
     if i.html and anchor_mismatch(i.html):
-        reasons.append("anchor_href_mismatch")
-    # Headers flags
+        r.append("anchor_href_mismatch")
     if i.headers_raw:
         h = parse_headers(i.headers_raw)
-        reasons += [k for k, v in h.items() if v]
-    return list(sorted(set(reasons)))
-
-@app.post("/predict")
-def predict(i: EmailInput):
-    text = join_text_email(i)
-    proba = float(pipe.predict_proba([text])[0, list(pipe.classes_).index("phishing")])
-    label = "phishing" if proba >= THRESHOLD else "ham"
-    reasons = collect_reasons(i)
-    return {"score": proba, "label": label, "reasons": reasons}
+        r += [k for k, v in h.items() if v]
+    return sorted(set(r))
 
 @app.get("/")
 def root():
     return {"status": "ok", "threshold": THRESHOLD, "endpoints": ["/predict", "/docs"]}
+
+@app.post("/predict")
+def predict(i: EmailInput):
+    text = _join(i)
+    ph_idx = list(pipe.classes_).index("phishing")
+    proba = float(pipe.predict_proba([text])[0, ph_idx])
+    label = "phishing" if proba >= THRESHOLD else "ham"
+    logger.info(
+    "EMAIL PREDICT id=%s score=%.4f label=%s reasons=%s",
+    getattr(email, "id", "NA"),
+    float(score),
+    label,
+    ",".join(reasons),
+)
+
+    return {"score": proba, "label": label, "reasons": _reasons(i)}
+
+# @app.post("/predict_sms")
+# def predict_sms(i: SmsInput):
+#     proba = float(pipe_sms.predict_proba([i.text])[0, list(pipe_sms.classes_).index("phishing")])
+#     label = "phishing" if proba >= THRESHOLD else "ham"
+#     return {"score": proba, "label": label, "reasons": []}
