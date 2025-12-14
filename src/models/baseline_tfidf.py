@@ -1,11 +1,9 @@
 """
 Baseline text classifier with TF-IDF + Logistic Regression and PR-curve.
 
-Assumptions:
 - Python 3.11, CPU.
 - Input CSV follows one of the schemas:
   * email: id,label,subject,body[,urls,from,reply_to,return_path,auth_results]
-  * sms:   id,label,text[,urls,sender]
 - Labels accepted: "ham" or "phishing" (or 0/1 which are remapped).
 
 Output artifacts (in --outdir):
