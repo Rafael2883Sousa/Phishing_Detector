@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Optional
 from src.rules.engine import load_rule_engine
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from joblib import load
 from fastapi import FastAPI
 
@@ -51,11 +51,27 @@ app = FastAPI()
 rule_engine = load_rule_engine()
 
 class EmailInput(BaseModel):
-    subject: Optional[str] = ""
-    body: Optional[str] = ""
-    urls: Optional[List[str]] = []
-    headers_raw: Optional[str] = ""
-    html: Optional[str] = ""
+    id: Optional[str] = Field(
+        None,
+        description="Identificador opcional da mensagem"
+    )
+    subject: str = Field(
+        ...,
+        description="Assunto do email"
+    )
+    body: str = Field(
+        ...,
+        description="Corpo textual do email"
+    )
+    headers_raw: Optional[str] = Field(
+        None,
+        description="Cabeçalhos completos do email (Authentication-Results, From, etc.)"
+    )
+    html: Optional[str] = Field(
+        None,
+        description="Conteúdo HTML bruto do email"
+    )
+
 
 class FeedbackInput(BaseModel):
     id: str
