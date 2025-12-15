@@ -76,21 +76,33 @@ class RuleEngine:
     def run(self, sample: dict) -> dict:
         """
         Canonical entrypoint for the Rule Engine.
-        Wraps `evaluate()` into a normalized output.
+        Separates accusatory vs neutral rules.
         """
         reasons, details = self.evaluate(sample)
 
-        # simple risk aggregation: normalized by number of rules
-        risk_score = min(len(reasons) / 5.0, 1.0)
+        ACCUSATORY_RULES = {
+            "has_at",
+            "tld_suspect",
+            "anchor_href_mismatch",
+            "auth_spf_fail",
+            "auth_dkim_fail",
+            "auth_dmarc_fail",
+            "from_reply_mismatch",
+            "from_return_mismatch",
+            "redirector_url",
+            "shortened_url",
+            "confusable",
+        }
 
-        logger.info(
-            "RULE_ENGINE fired=%d reasons=%s",
-            len(reasons),
-            ",".join(reasons),
-        )
+        accusatory_hits = [r for r in reasons if r in ACCUSATORY_RULES]
+        neutral_hits = [r for r in reasons if r not in ACCUSATORY_RULES]
+
+        risk_score = min(len(accusatory_hits) / 3.0, 1.0)
 
         return {
             "reasons": reasons,
+            "accusatory_hits": accusatory_hits,
+            "neutral_hits": neutral_hits,
             "risk_score": risk_score,
             "details": details,
         }

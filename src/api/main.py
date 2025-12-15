@@ -82,30 +82,19 @@ def root():
 
 @app.post("/predict")
 def predict(i: EmailInput):
+
     text = _join(i)
-    reasons = _reasons(i)
 
-    proba = None
-    label = "ham"
-    decision_source = "rules"
+    classes = list(pipe.classes_)
+    if "phishing" not in classes:
+        raise RuntimeError(f"Pipeline classes inválidas: {classes}")
 
-    if pipe is not None:
-        classes = list(pipe.classes_)
+    ph_idx = classes.index("phishing")
+    proba = float(pipe.predict_proba([text])[0, ph_idx])
 
-        if "phishing" in classes:
-            pos_label = "phishing"
-        elif "spam" in classes:
-            pos_label = "spam"
-        elif 1 in classes:
-            pos_label = 1
-        else:
-            raise RuntimeError(f"Cannot determine positive class from {classes}")
+    ml_phish = proba >= THRESHOLD
 
-        ph_idx = classes.index(pos_label)
-
-        proba = float(pipe.predict_proba([text])[0, ph_idx])
-        label = "phishing" if proba >= THRESHOLD else "ham"
-        decision_source = "ml+rules"
+    rule_engine = load_rule_engine()
 
     rule_out = rule_engine.run({
         "subject": i.subject,
@@ -115,17 +104,28 @@ def predict(i: EmailInput):
         "html": i.html,
     })
 
-    reasons = sorted(set(reasons + rule_out.get("reasons", [])))
+    reasons = rule_out.get("reasons", [])
+    risk_score = float(rule_out.get("risk_score", 0.0))
 
-    if proba is None:
-        proba = rule_out.get("risk_score", 0.0)
-        label = "phishing" if proba >= 0.5 else "ham"
+    rules_phish = risk_score > 0.0 
+
+    if ml_phish and rules_phish:
+        label = "phishing"
+        decision_source = "ml+rules"
+    elif ml_phish and not rules_phish:
+        label = "suspicious"
+        decision_source = "ml_only"
+    else:
+        label = "ham"
+        decision_source = "none"
 
     logger.info(
-        "EMAIL PREDICT score=%.4f label=%s source=%s reasons=%s",
+        "EMAIL PREDICT score=%.4f ml=%s rules=%s risk=%.2f label=%s reasons=%s",
         proba,
+        ml_phish,
+        rules_phish,
+        risk_score,
         label,
-        decision_source,
         ",".join(reasons),
     )
 
@@ -133,11 +133,6 @@ def predict(i: EmailInput):
         "score": proba,
         "label": label,
         "reasons": reasons,
+        "risk_score": risk_score,
         "decision_source": decision_source,
     }
-
-# @app.post("/predict_sms")
-# def predict_sms(i: SmsInput):
-#     proba = float(pipe_sms.predict_proba([i.text])[0, list(pipe_sms.classes_).index("phishing")])
-#     label = "phishing" if proba >= THRESHOLD else "ham"
-#     return {"score": proba, "label": label, "reasons": []}
