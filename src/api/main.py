@@ -135,9 +135,11 @@ def predict(i: EmailInput):
         ",".join(reasons),
     )
 
+    public_label = "phishing" if label == "phishing" else "legit"
+
     return {
         "score": proba,
-        "label": label,
+        "label": public_label,
         "reasons": reasons,
         "risk_score": risk_score,
         "decision_source": decision_source,
