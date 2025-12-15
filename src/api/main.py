@@ -57,6 +57,11 @@ class EmailInput(BaseModel):
     headers_raw: Optional[str] = ""
     html: Optional[str] = ""
 
+class FeedbackInput(BaseModel):
+    id: str
+    label_true: str 
+    context: Optional[str] = None 
+
 class SmsInput(BaseModel):
     text: str
     urls: list[str] | None = None
@@ -144,3 +149,23 @@ def predict(i: EmailInput):
         "risk_score": risk_score,
         "decision_source": decision_source,
     }
+
+FEEDBACK_PATH = os.environ.get("FEEDBACK_PATH", "outputs/feedback.jsonl")
+
+@app.post("/feedback")
+def feedback(f: FeedbackInput):
+    os.makedirs(os.path.dirname(FEEDBACK_PATH), exist_ok=True)
+
+    record = {
+        "id": f.id,
+        "label_true": f.label_true,
+        "context": f.context,
+    }
+
+    with open(FEEDBACK_PATH, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    logger.info("FEEDBACK id=%s label=%s context=%s", f.id, f.label_true, f.context)
+
+    return {"status": "ok"}
+
