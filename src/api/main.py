@@ -86,10 +86,16 @@ def predict(i: EmailInput):
     text = _join(i)
 
     classes = list(pipe.classes_)
-    if "phishing" not in classes:
-        raise RuntimeError(f"Pipeline classes inválidas: {classes}")
 
-    ph_idx = classes.index("phishing")
+    if "phishing" in classes:
+        ph_idx = classes.index("phishing")
+
+    elif 1 in classes:
+        ph_idx = classes.index(1)
+
+    else:
+        raise RuntimeError(f"Pipeline classes not suported: {classes}")
+
     proba = float(pipe.predict_proba([text])[0, ph_idx])
 
     ml_phish = proba >= THRESHOLD
