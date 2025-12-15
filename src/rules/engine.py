@@ -73,6 +73,28 @@ class RuleEngine:
         self.redirector_indicators = set(self.config.get("redirectors", []))
         self.ptbr_markers = set(self.config.get("ptbr_markers", []))
 
+    def run(self, sample: dict) -> dict:
+        """
+        Canonical entrypoint for the Rule Engine.
+        Wraps `evaluate()` into a normalized output.
+        """
+        reasons, details = self.evaluate(sample)
+
+        # simple risk aggregation: normalized by number of rules
+        risk_score = min(len(reasons) / 5.0, 1.0)
+
+        logger.info(
+            "RULE_ENGINE fired=%d reasons=%s",
+            len(reasons),
+            ",".join(reasons),
+        )
+
+        return {
+            "reasons": reasons,
+            "risk_score": risk_score,
+            "details": details,
+        }
+
     def _load_config(self) -> Dict[str, Any]:
         if self.config_path and self.config_path.exists():
             try:
