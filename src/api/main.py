@@ -3,6 +3,7 @@ from __future__ import annotations
 import os, sys, json
 from pathlib import Path
 from typing import List, Optional
+from src.rules.engine import load_rule_engine
 
 from pydantic import BaseModel
 from joblib import load
@@ -11,9 +12,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from joblib import load
 
-from features.url_signals import url_features
-from features.html_url import anchor_mismatch
-from features.headers import parse_headers
+from src.features.url_signals import url_features
+from src.features.html_url import anchor_mismatch
+from src.features.headers import parse_headers
 
 import logging
 
