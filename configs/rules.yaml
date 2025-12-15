@@ -1,0 +1,28 @@
+suspect_tlds:
+  - ".tk"
+  - ".ml"
+  - ".cf"
+  - ".gq"
+  - ".zip"
+  - ".mov"
+
+shorteners:
+  - "bit.ly"
+  - "tinyurl.com"
+  - "t.co"
+  - "goo.gl"
+  - "ow.ly"
+
+redirectors:
+  - "l.facebook.com"
+  - "urldefense.proofpoint.com"
+  - "safelinks.protection.outlook.com"
+
+ptbr_markers:
+  - "você"
+  - "voce"
+  - "cpf"
+  - "boleto"
+  - "pix"
+  - "celular"
+  - "fatura"
