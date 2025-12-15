@@ -7,10 +7,7 @@ from src.rules.engine import load_rule_engine
 
 from pydantic import BaseModel
 from joblib import load
-
 from fastapi import FastAPI
-from pydantic import BaseModel
-from joblib import load
 
 from src.features.url_signals import url_features
 from src.features.html_url import anchor_mismatch
@@ -35,7 +32,11 @@ PIPE_PATH   = os.environ.get("PIPE_PATH", "outputs_email/tfidf_logreg_pipeline.j
 
 REPORT_PATH = os.environ.get("REPORT_PATH", "outputs_email/baseline_report.json")
 
-pipe = load(PIPE_PATH)
+try:
+    pipe = load(PIPE_PATH)
+except Exception as e:
+    logger.warning("ML pipeline not loaded: %s", e)
+    pipe = None
 
 THRESHOLD = float(os.environ.get("THRESHOLD", "0.5"))
 try:
@@ -45,6 +46,7 @@ except Exception:
     pass
 
 app = FastAPI()
+rule_engine = load_rule_engine()
 
 class EmailInput(BaseModel):
     subject: Optional[str] = ""
@@ -79,18 +81,46 @@ def root():
 @app.post("/predict")
 def predict(i: EmailInput):
     text = _join(i)
-    ph_idx = list(pipe.classes_).index("phishing")
-    proba = float(pipe.predict_proba([text])[0, ph_idx])
-    label = "phishing" if proba >= THRESHOLD else "ham"
-    logger.info(
-    "EMAIL PREDICT id=%s score=%.4f label=%s reasons=%s",
-    getattr(email, "id", "NA"),
-    float(score),
-    label,
-    ",".join(reasons),
-)
+    reasons = _reasons(i)
 
-    return {"score": proba, "label": label, "reasons": _reasons(i)}
+    proba = None
+    label = "ham"
+    decision_source = "rules"
+
+    if pipe is not None:
+        ph_idx = list(pipe.classes_).index("phishing")
+        proba = float(pipe.predict_proba([text])[0, ph_idx])
+        label = "phishing" if proba >= THRESHOLD else "ham"
+        decision_source = "ml+rules"
+
+    rule_out = rule_engine.run({
+        "subject": i.subject,
+        "body": i.body,
+        "urls": i.urls,
+        "headers_raw": i.headers_raw,
+        "html": i.html,
+    })
+
+    reasons = sorted(set(reasons + rule_out.get("reasons", [])))
+
+    if proba is None:
+        proba = rule_out.get("risk_score", 0.0)
+        label = "phishing" if proba >= 0.5 else "ham"
+
+    logger.info(
+        "EMAIL PREDICT score=%.4f label=%s source=%s reasons=%s",
+        proba,
+        label,
+        decision_source,
+        ",".join(reasons),
+    )
+
+    return {
+        "score": proba,
+        "label": label,
+        "reasons": reasons,
+        "decision_source": decision_source,
+    }
 
 # @app.post("/predict_sms")
 # def predict_sms(i: SmsInput):
