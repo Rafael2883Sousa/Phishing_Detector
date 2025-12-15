@@ -38,6 +38,8 @@ except Exception as e:
     logger.warning("ML pipeline not loaded: %s", e)
     pipe = None
 
+logger.info("Loaded ML pipeline with classes: %s", list(pipe.classes_))
+
 THRESHOLD = float(os.environ.get("THRESHOLD", "0.5"))
 try:
     with open(REPORT_PATH, "r") as f:
@@ -88,7 +90,19 @@ def predict(i: EmailInput):
     decision_source = "rules"
 
     if pipe is not None:
-        ph_idx = list(pipe.classes_).index("phishing")
+        classes = list(pipe.classes_)
+
+        if "phishing" in classes:
+            pos_label = "phishing"
+        elif "spam" in classes:
+            pos_label = "spam"
+        elif 1 in classes:
+            pos_label = 1
+        else:
+            raise RuntimeError(f"Cannot determine positive class from {classes}")
+
+        ph_idx = classes.index(pos_label)
+
         proba = float(pipe.predict_proba([text])[0, ph_idx])
         label = "phishing" if proba >= THRESHOLD else "ham"
         decision_source = "ml+rules"
