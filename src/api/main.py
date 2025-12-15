@@ -2,7 +2,7 @@
 from __future__ import annotations
 import os, sys, json
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Literal
 from src.rules.engine import load_rule_engine
 
 from pydantic import BaseModel, Field
@@ -78,9 +78,25 @@ class FeedbackInput(BaseModel):
     label_true: str 
     context: Optional[str] = None 
 
-class SmsInput(BaseModel):
-    text: str
-    urls: list[str] | None = None
+class PredictResponse(BaseModel):
+    score: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Probabilidade estimada da classe phishing"
+    )
+    label: Literal["phishing", "legit"] = Field(
+        ...,
+        description="Decisão final após aplicação do limiar"
+    )
+    reasons: List[str] = Field(
+        ...,
+        description="Sinais estruturais que contribuíram para a decisão"
+    )
+
+# class SmsInput(BaseModel):
+#     text: str
+#     urls: list[str] | None = None
 
 def _join(i: EmailInput) -> str:
     return f"{i.subject or ''} {i.body or ''}".strip()
@@ -101,7 +117,10 @@ def _reasons(i: EmailInput) -> List[str]:
 def root():
     return {"status": "ok", "threshold": THRESHOLD, "endpoints": ["/predict", "/docs"]}
 
-@app.post("/predict")
+@app.post("/predict",
+    response_model=PredictResponse,
+    summary="Classificação de phishing em emails",
+    description="Deteção offline de phishing baseada em TF-IDF e regras explicáveis")
 def predict(i: EmailInput):
 
     text = _join(i)
@@ -162,8 +181,6 @@ def predict(i: EmailInput):
         "score": proba,
         "label": public_label,
         "reasons": reasons,
-        "risk_score": risk_score,
-        "decision_source": decision_source,
     }
 
 FEEDBACK_PATH = os.environ.get("FEEDBACK_PATH", "outputs/feedback.jsonl")
