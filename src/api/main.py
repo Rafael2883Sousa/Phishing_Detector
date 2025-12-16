@@ -231,7 +231,6 @@ def predict(i: EmailInput):
         "EMAIL PREDICT score=%.4f ml=%s rules=%s risk=%.2f label=%s reasons=%s",
         proba,
         ml_phish,
-        rules_phish,
         risk_score,
         label,
         decision_source,
