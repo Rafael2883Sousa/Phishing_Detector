@@ -79,8 +79,8 @@ source .venv/bin/activate'
 
 ## 📦 Instalar Dependências
 
-```pip install --upgrade pip
-```pip install -r requirements.txt
+```pip install --upgrade pip```
+pip install -r requirements.txt
 
 ## ▶️ Execução
 🔧 Iniciar a API
