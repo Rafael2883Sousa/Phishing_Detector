@@ -73,6 +73,17 @@ class EmailInput(BaseModel):
         description="Conteúdo HTML bruto do email"
     )
 
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "subject": "Atualização de segurança da conta",
+                "body": "Por favor confirme os seus dados no portal.",
+                "headers_raw": "From: suporte@empresa.pt",
+                "html": "<a href='http://exemplo.com'>empresa.pt</a>"
+            }
+        }
+    }
+
 
 class FeedbackInput(BaseModel):
     id: str
@@ -94,6 +105,25 @@ class PredictResponse(BaseModel):
         ...,
         description="Sinais estruturais que contribuíram para a decisão"
     )
+
+class PredictionOutput(BaseModel):
+    score: float
+    label: str
+    reasons: list[str]
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "score": 0.73,
+                "label": "phishing",
+                "reasons": [
+                    "tld_suspect",
+                    "anchor_href_mismatch",
+                    "from_reply_mismatch"
+                ]
+            }
+        }
+    }
 
 # class SmsInput(BaseModel):
 #     text: str
@@ -133,9 +163,17 @@ def root():
     return {"status": "ok", "threshold": THRESHOLD, "endpoints": ["/predict", "/docs"]}
 
 @app.post("/predict",
-    response_model=PredictResponse,
-    summary="Classificação de phishing em emails",
-    description="Deteção offline de phishing baseada em TF-IDF e regras explicáveis")
+    response_model=PredictionOutput,
+    summary="Phishing predition (email)",
+    description="""
+    Avalia uma mensagem de email para deteção de phishing.
+
+- Extração automática de URLs
+- Modelo TF-IDF + classificador linear
+- Limiar calibrado via curva Precision-Recall
+- Explicações baseadas em regras determinísticas
+""",
+)
 def predict(i: EmailInput):
 
     text = _join(i)
