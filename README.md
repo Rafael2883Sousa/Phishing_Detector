@@ -37,7 +37,7 @@ Vetorização TF-IDF (baseline)
 Classificação binária: phishing vs legítimo
 
 ## 🗂️ Estrutura do Projeto
-
+```
 Phishing_Detector/
 │
 ├── src/
@@ -61,7 +61,7 @@ Phishing_Detector/
 ├── requirements.txt
 ├── README.md
 └── .gitignore
-
+```
 ## 🚀 Instalação
 ### 🧩 Pré-requisitos
 
@@ -74,17 +74,17 @@ Phishing_Detector/
 
 ## 🧪 Criar Ambiente Virtual
 
-'python3.11 -m venv .venv
-source .venv/bin/activate'
+```python3.11 -m venv .venv```
+```source .venv/bin/activate```
 
 ## 📦 Instalar Dependências
 
 ```pip install --upgrade pip```
-pip install -r requirements.txt
+```pip install -r requirements.txt```
 
 ## ▶️ Execução
 🔧 Iniciar a API
-```uvicorn src.api.main:app --reload --port 8000
+```uvicorn src.api.main:app --reload --port 8000```
 
 A API ficará disponível em:
 
@@ -94,11 +94,11 @@ A API ficará disponível em:
 
 ## 🧪 Exemplo de Utilização
 📤 Pedido de Classificação
-
+```
 {
 "url": "http://secure-login-update.example.com"
 }
-
+```
 📥 Resposta
 
 {
