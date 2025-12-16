@@ -160,7 +160,6 @@ def predict(i: EmailInput):
     rule_out = rule_engine.run({
         "subject": i.subject,
         "body": i.body,
-        "urls": i.urls,
         "headers_raw": i.headers_raw,
         "html": i.html,
     })
