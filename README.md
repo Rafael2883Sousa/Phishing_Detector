@@ -100,13 +100,13 @@ A API ficará disponível em:
 }
 ```
 📥 Resposta
-
+```
 {
 "label": "phishing",
 "score": 0.87,
 "rules_triggered": ["suspicious_tld", "long_url"]
 }
-
+```
 ## 📊 Avaliação
 
 Métricas utilizadas:
