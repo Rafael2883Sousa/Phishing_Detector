@@ -117,6 +117,14 @@ class RuleEngine:
                 logger.warning("Failed to parse rules config: %s", e)
                 return {}
         return {}
+    
+    EMAIL_RE = re.compile(
+        r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+    )
+
+    def extract_email(value: str) -> str:
+        m = EMAIL_RE.search(value or "")
+        return m.group(1).lower() if m else ""
 
     def evaluate(self, sample: Dict[str, Any]) -> Tuple[List[str], Dict[str, Dict[str, Any]]]:
         """
@@ -138,6 +146,8 @@ class RuleEngine:
         urls = sample.get("urls")
         if urls is None:
             urls = extract_urls(text)
+        if html:
+            urls += extract_urls(html)
         headers_raw = (sample.get("headers_raw") or "") or ""
         html = (sample.get("html") or "") or ""
 
@@ -255,13 +265,21 @@ class RuleEngine:
                     try:
                         from_match = re.search(r"From:\s*([^\n\r]+)", headers_raw, flags=re.IGNORECASE)
                         reply_match = re.search(r"Reply-To:\s*([^\n\r]+)", headers_raw, flags=re.IGNORECASE)
+
                         if from_match and reply_match:
-                            from_addr = from_match.group(1).strip()
-                            reply_addr = reply_match.group(1).strip()
-                            if "@" in from_addr and "@" in reply_addr:
-                                if from_addr.split("@")[-1].lower() != reply_addr.split("@")[-1].lower():
+                            from_email = extract_email(from_match.group(1))
+                            reply_email = extract_email(reply_match.group(1))
+
+                            if from_email and reply_email:
+                                from_domain = from_email.split("@")[1]
+                                reply_domain = reply_email.split("@")[1]
+
+                                if from_domain != reply_domain:
                                     reasons.append("from_reply_mismatch")
-                                    details.setdefault("from_reply_mismatch", {})["value"] = {"from": from_addr, "reply-to": reply_addr}
+                                    details.setdefault("from_reply_mismatch", {})["value"] = {
+                                        "from": from_email,
+                                        "reply_to": reply_email
+                                    }
                     except Exception:
                         pass
 
