@@ -68,6 +68,7 @@ class RuleEngine:
     def __init__(self, config_path: Path | None = None):
         self.config_path = config_path or CONFIG_PATH
         self.config = self._load_config()
+        self.weights = self.config.get("weights", {})
         self.suspect_tlds = set(self.config.get("suspect_tlds", DEFAULT_SUSPECT_TLDS))
         self.shortener_hosts = set(self.config.get("shorteners", []))
         self.redirector_indicators = set(self.config.get("redirectors", []))
