@@ -205,10 +205,27 @@ def predict(i: EmailInput):
     reasons = rule_out.get("reasons", [])
     risk_score = float(rule_out.get("risk_score", 0.0))
 
-    rules_phish = risk_score > 0.0 
+    # --- Decisão final (ML + regras) ---
 
-    label = "phishing" if ml_phish else "legit"
-    decision_source = "ml"
+    # Caso 1: múltiplas regras acusatórias → override
+    if risk_score >= 0.66:
+        label = "phishing"
+        decision_source = "rules_override"
+
+    # Caso 2: ML confiante
+    elif ml_phish:
+        label = "phishing"
+        decision_source = "ml"
+
+    # Caso 3: borderline textual + pelo menos 1 regra
+    elif proba >= 0.6 and risk_score > 0.0:
+        label = "phishing"
+        decision_source = "ml_borderline+rules"
+
+    # Caso 4: benigno
+    else:
+        label = "legit"
+        decision_source = "none"
 
     logger.info(
         "EMAIL PREDICT score=%.4f ml=%s rules=%s risk=%.2f label=%s reasons=%s",
@@ -217,6 +234,7 @@ def predict(i: EmailInput):
         rules_phish,
         risk_score,
         label,
+        decision_source,
         ",".join(reasons),
     )
 
