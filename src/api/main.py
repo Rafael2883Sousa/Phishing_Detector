@@ -207,7 +207,7 @@ def predict(i: EmailInput):
 
     rules_phish = risk_score > 0.0 
 
-    label = "phishing" if ml_phish else "ham"
+    label = "phishing" if ml_phish else "legit"
     decision_source = "ml"
 
     logger.info(
