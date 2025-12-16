@@ -98,6 +98,7 @@ class RuleEngine:
         neutral_hits = [r for r in reasons if r not in ACCUSATORY_RULES]
 
         risk_score = min(len(accusatory_hits) / 3.0, 1.0)
+        risk_score += self.weights.get(rule_name, 0.0)
 
         return {
             "reasons": reasons,
@@ -238,6 +239,9 @@ class RuleEngine:
         if _headers and hasattr(_headers, "parse_headers"):
             try:
                 parsed = _headers.parse_headers(headers_raw)
+                if parsed["from_domains"] and parsed["reply_domains"]:
+                    if set(parsed["from_domains"]) != set(parsed["reply_domains"]):
+                        reasons.append("from_reply_mismatch")
                 # parsed expected keys: auth_spf_fail, auth_dkim_fail, auth_dmarc_fail, from_reply_mismatch, from_return_mismatch
                 for k in ("auth_spf_fail", "auth_dkim_fail", "auth_dmarc_fail"):
                     if parsed.get(k):

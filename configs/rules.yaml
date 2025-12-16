@@ -26,3 +26,10 @@ ptbr_markers:
   - "pix"
   - "celular"
   - "fatura"
+
+weights:
+  from_reply_mismatch: 0.15
+  auth_spf_fail: 0.6
+  auth_dkim_fail: 0.5
+  tld_suspect: 0.4
+
