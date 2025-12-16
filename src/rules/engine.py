@@ -144,12 +144,13 @@ class RuleEngine:
         body = (sample.get("body") or "") or ""
         text = (subject + " " + body).strip()
         urls = sample.get("urls")
+        html = (sample.get("html") or "") or ""
         if urls is None:
             urls = extract_urls(text)
         if html:
             urls += extract_urls(html)
         headers_raw = (sample.get("headers_raw") or "") or ""
-        html = (sample.get("html") or "") or ""
+       
 
         # Rule: has_at_in_url
         for u in urls:
