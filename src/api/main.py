@@ -207,15 +207,8 @@ def predict(i: EmailInput):
 
     rules_phish = risk_score > 0.0 
 
-    if ml_phish and rules_phish:
-        label = "phishing"
-        decision_source = "ml+rules"
-    elif ml_phish and not rules_phish:
-        label = "suspicious"
-        decision_source = "ml_only"
-    else:
-        label = "ham"
-        decision_source = "none"
+    label = "phishing" if ml_phish else "ham"
+    decision_source = "ml"
 
     logger.info(
         "EMAIL PREDICT score=%.4f ml=%s rules=%s risk=%.2f label=%s reasons=%s",
@@ -227,11 +220,9 @@ def predict(i: EmailInput):
         ",".join(reasons),
     )
 
-    public_label = "phishing" if label == "phishing" else "legit"
-
     return {
         "score": proba,
-        "label": public_label,
+        "label": label,
         "reasons": reasons,
     }
 

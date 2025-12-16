@@ -68,17 +68,13 @@ class RuleEngine:
     def __init__(self, config_path: Path | None = None):
         self.config_path = config_path or CONFIG_PATH
         self.config = self._load_config()
-        self.weights = self.config.get("weights", {})
+        
         self.suspect_tlds = set(self.config.get("suspect_tlds", DEFAULT_SUSPECT_TLDS))
         self.shortener_hosts = set(self.config.get("shorteners", []))
         self.redirector_indicators = set(self.config.get("redirectors", []))
         self.ptbr_markers = set(self.config.get("ptbr_markers", []))
 
     def run(self, sample: dict) -> dict:
-        """
-        Canonical entrypoint for the Rule Engine.
-        Separates accusatory vs neutral rules.
-        """
         reasons, details = self.evaluate(sample)
 
         ACCUSATORY_RULES = {
@@ -98,8 +94,8 @@ class RuleEngine:
         accusatory_hits = [r for r in reasons if r in ACCUSATORY_RULES]
         neutral_hits = [r for r in reasons if r not in ACCUSATORY_RULES]
 
+        # 1 sinal forte ≈ 0.33 | 2 ≈ 0.66 | ≥3 → 1.0
         risk_score = min(len(accusatory_hits) / 3.0, 1.0)
-        risk_score += self.weights.get(rule_name, 0.0)
 
         return {
             "reasons": reasons,
@@ -108,6 +104,8 @@ class RuleEngine:
             "risk_score": risk_score,
             "details": details,
         }
+
+
 
     def _load_config(self) -> Dict[str, Any]:
         if self.config_path and self.config_path.exists():
