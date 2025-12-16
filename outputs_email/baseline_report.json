@@ -1,0 +1,11 @@
+{
+  "best": {
+    "threshold": 0.85,
+    "criterion": "Recall >= 0.90 with maximal Precision",
+    "note": "Threshold definido de forma conservadora com base na análise das curvas PR dos experimentos E0–E5."
+  },
+  "metrics": {
+    "primary": ["precision", "recall", "f1"],
+    "secondary": ["pr_auc", "roc_auc"]
+  }
+}
