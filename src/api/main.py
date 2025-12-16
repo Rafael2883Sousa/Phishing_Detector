@@ -4,6 +4,7 @@ import os, sys, json
 from pathlib import Path
 from typing import List, Optional, Literal
 from src.rules.engine import load_rule_engine
+from src.rules.engine import extract_urls
 
 from pydantic import BaseModel, Field
 from joblib import load
@@ -101,17 +102,31 @@ class PredictResponse(BaseModel):
 def _join(i: EmailInput) -> str:
     return f"{i.subject or ''} {i.body or ''}".strip()
 
-def _reasons(i: EmailInput) -> List[str]:
-    r: List[str] = []
-    for u in (i.urls or []):
+def _reasons(i: EmailInput) -> list[str]:
+    reasons: list[str] = []
+
+    urls = _extract_urls(i)
+
+    for u in urls:
         feats = url_features(u)
-        r += [k for k, v in feats.items() if isinstance(v, bool) and v]
+        reasons += [k for k, v in feats.items() if isinstance(v, bool) and v]
+
     if i.html and anchor_mismatch(i.html):
-        r.append("anchor_href_mismatch")
+        reasons.append("anchor_href_mismatch")
+
     if i.headers_raw:
         h = parse_headers(i.headers_raw)
-        r += [k for k, v in h.items() if v]
-    return sorted(set(r))
+        reasons += [k for k, v in h.items() if v]
+
+    return sorted(set(reasons))
+
+
+def _extract_urls(i: EmailInput) -> list[str]:
+    text = f"{i.subject} {i.body}"
+    urls = extract_urls(text)
+    if i.html:
+        urls += extract_urls(i.html)
+    return list(set(urls))
 
 @app.get("/")
 def root():
