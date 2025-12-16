@@ -222,7 +222,11 @@ def predict(i: EmailInput):
         label = "phishing"
         decision_source = "ml_borderline+rules"
 
-    # Caso 4: benigno
+    # Caso 4: ML confiante e zero regras
+    elif ml_phish and not rules_phish:
+        label = "suspicious"
+
+    # Caso 5: benigno
     else:
         label = "legit"
         decision_source = "none"
