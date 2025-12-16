@@ -1,4 +1,4 @@
-# 🛡️ Phishing Detector — Projeto de Fim de Curso
+# 🛡️ Phishing Detector
 
 Deteção automática de phishing utilizando técnicas de Processamento de Linguagem Natural (NLP) e Machine Learning
 
